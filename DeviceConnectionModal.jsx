@@ -8,22 +8,9 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import { Device } from "react-native-ble-plx";
 
-type DeviceModalListItemProps = {
-  item: ListRenderItemInfo<Device>;
-  connectToPeripheral: (device: Device) => void;
-  closeModal: () => void;
-};
 
-type DeviceModalProps = {
-  devices: Device[];
-  visible: boolean;
-  connectToPeripheral: (device: Device) => void;
-  closeModal: () => void;
-};
-
-const DeviceModalListItem: FC<DeviceModalListItemProps> = (props) => {
+const DeviceModalListItem = (props) => {
   const { item, connectToPeripheral, closeModal } = props;
 
   const connectAndCloseModal = useCallback(() => {
@@ -41,11 +28,11 @@ const DeviceModalListItem: FC<DeviceModalListItemProps> = (props) => {
   );
 };
 
-const DeviceModal: FC<DeviceModalProps> = (props) => {
+const DeviceModal = (props) => {
   const { devices, visible, connectToPeripheral, closeModal } = props;
 
   const renderDeviceModalListItem = useCallback(
-    (item: ListRenderItemInfo<Device>) => {
+    (item) => {
       return (
         <DeviceModalListItem
           item={item}

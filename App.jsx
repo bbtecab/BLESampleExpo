@@ -20,7 +20,7 @@ const App = () => {
     heartRate,
     disconnectFromDevice,
   } = useBLE();
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const scanForDevices = async () => {
     const isPermissionsEnabled = await requestPermissions();
