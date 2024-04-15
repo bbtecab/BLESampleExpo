@@ -86,7 +86,7 @@ function useBLE() {
       if (error) {
         console.log(error);
       }
-      if (device && device.name?.includes("BTC")) {
+      if (device && device.name?.includes("Step")) {
         setAllDevices((prevState) => {
           if (!isDuplicteDevice(prevState, device)) {
             return [...prevState, device];

@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@shopify/react-native-skia": "0.1.172",
-    "eas-cli": "^7.8.1",
     "expo": "~48.0.21",
     "expo-dev-client": "~2.2.1",
     "expo-device": "~5.2.1",
@@ -24,7 +23,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
-    "@types/react": "~18.0.14",
     "@types/react-native-base64": "^0.2.0"
   },
   "private": true
