@@ -1,11 +1,9 @@
 #include <Wire.h>
-#include <EEPROM.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
 
-#define BUTTON_PIN 2
 #define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define STEP_DATA_CHAR_UUID "beefcafe-36e1-4688-b7f5-00000000000b"
 
@@ -16,18 +14,20 @@ int16_t accelX, accelY, accelZ;
 int stepCount = 0;
 float accMagnitudePrev = 0;
 
+// Define MyServerCallbacks class before using it in setup()
+class MyServerCallbacks: public BLEServerCallbacks {
+    void onConnect(BLEServer* pServer) {
+      BLEDevice::stopAdvertising(); // Optional: stop advertising when connected
+      Serial.println("Client connected");
+    }
 
-void resetEEPROM() {
-  for (int i = 0 ; i < EEPROM.length() ; i++) {
-    EEPROM.write(i, 0);
-  }
-  EEPROM.commit();
-  stepCount = 0;
-  Serial.println("EEPROM reset");
-}
+    void onDisconnect(BLEServer* pServer) {
+      BLEDevice::startAdvertising(); // Restart advertising
+      Serial.println("Client disconnected, start advertising again");
+    }
+};
 
 void setup() {
-  // put your setup code here, to run once:
   Wire.begin();
   Serial.begin(9600);
   Wire.beginTransmission(MPU_ADDR);
@@ -36,47 +36,31 @@ void setup() {
   Wire.endTransmission(true);
   delay(2000);
 
-    // Create BLE device, server, and service
   BLEDevice::init("Step-Sense");
-  
   BLEServer *pServer = BLEDevice::createServer();
-  BLEService *pService = pServer->createService(SERVICE_UUID);
+  pServer->setCallbacks(new MyServerCallbacks()); // Set the server callbacks
 
-  // Create step data characteristic
+  BLEService *pService = pServer->createService(SERVICE_UUID);
   pStepDataCharacteristic = pService->createCharacteristic(
-      STEP_DATA_CHAR_UUID,
-      BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
+    STEP_DATA_CHAR_UUID,
+    BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
   pStepDataCharacteristic->addDescriptor(new BLE2902());
 
-  // Start BLE server and advertising
   pService->start();
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
   pAdvertising->addServiceUUID(SERVICE_UUID);
   pAdvertising->setScanResponse(true);
   pAdvertising->setMinPreferred(0x06);
-  pAdvertising->setMaxPreferred(0x100);
+  pAdvertising->setMaxPreferred(0x20);
   BLEDevice::startAdvertising();
   Serial.println("BLE device is ready to be connected");
-
-
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-
-  EEPROM.begin(sizeof(int));
-  EEPROM.get(0, stepCount);
-
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if (digitalRead(BUTTON_PIN) == LOW) {
-    resetEEPROM();
-    // delay(1000); // Debouncing the button press
-  }
   readAccelerometerData();
   detectStep();
-  displayStepCount();
   delay(100);
-
 }
 
 void readAccelerometerData() {
@@ -88,12 +72,13 @@ void readAccelerometerData() {
   accelX = Wire.read() << 8 | Wire.read();
   accelY = Wire.read() << 8 | Wire.read();
   accelZ = Wire.read() << 8 | Wire.read();
-}
-
-void saveStepCount() {
-  // Save stepCount to EEPROM
-  EEPROM.put(0, stepCount);
-  EEPROM.commit();
+  
+  Serial.print("X: ");
+  Serial.print(accelX);
+  Serial.print(" Y: ");
+  Serial.print(accelY);
+  Serial.print(" Z: ");
+  Serial.println(accelZ);
 }
 
 void detectStep() {
@@ -105,21 +90,17 @@ void detectStep() {
   // accX * accX is equivalent to pow(accX, 2)
   float accMagnitude = sqrt(accX * accX + accY * accY + accZ * accZ);
   // float accMagnitude = sqrt(accX * accX + accY * accY + accZ * accZ);: This line calculates the magnitude of the acceleration vector using the calculated acceleration values for the X, Y, and Z axes. The sqrt() function is used to calculate the square root of the sum of the squared acceleration values.
-  
+
   // Peak detection
   if (accMagnitudePrev > accMagnitude + 0.1 && accMagnitudePrev > 1.5) {
     stepCount++;
-    saveStepCount();
-      // Create a string containing the step count data
+    Serial.print("Step: ");
+    Serial.println(stepCount);
+    // Create a string containing the step count data
     String stepData = String(stepCount);
     // Update the characteristic value
     pStepDataCharacteristic->setValue(stepData.c_str());
     pStepDataCharacteristic->notify();
   }
   accMagnitudePrev = accMagnitude;
-}
-
-void displayStepCount() {
-  Serial.print("Steps: ");
-  Serial.println(stepCount);
 }

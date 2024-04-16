@@ -7,7 +7,6 @@ import {
   View,
 } from "react-native";
 import DeviceModal from "./DeviceConnectionModal";
-import { PulseIndicator } from "./PulseIndicator";
 import useBLE from "./useBLE";
 
 const App = () => {
@@ -17,7 +16,7 @@ const App = () => {
     allDevices,
     connectToDevice,
     connectedDevice,
-    heartRate,
+    steps,
     disconnectFromDevice,
   } = useBLE();
 
@@ -44,9 +43,8 @@ const App = () => {
       <View style={styles.heartRateTitleWrapper}>
         {connectedDevice ? (
           <>
-            <PulseIndicator />
-            <Text style={styles.heartRateTitleText}>Your Heart Rate Is:</Text>
-            <Text style={styles.heartRateText}>{heartRate} bpm</Text>
+            <Text style={styles.heartRateTitleText}>Your step count is:</Text>
+            <Text style={styles.heartRateText}>{steps} steps</Text>
           </>
         ) : (
           <Text style={styles.heartRateTitleText}>
