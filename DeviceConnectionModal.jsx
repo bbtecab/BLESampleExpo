@@ -1,7 +1,6 @@
-import React, { FC, useCallback } from "react";
+import React, { useCallback } from "react";
 import {
   FlatList,
-  ListRenderItemInfo,
   Modal,
   SafeAreaView,
   Text,
@@ -53,7 +52,7 @@ const DeviceModal = (props) => {
     >
       <SafeAreaView style={modalStyle.modalTitle}>
         <Text style={modalStyle.modalTitleText}>
-          Tap on a device to connect
+          Tap on a Step Sensor to Connect
         </Text>
         <FlatList
           contentContainerStyle={modalStyle.modalFlatlistContiner}

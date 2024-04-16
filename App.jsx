@@ -20,6 +20,7 @@ const App = () => {
     heartRate,
     disconnectFromDevice,
   } = useBLE();
+
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const scanForDevices = async () => {
@@ -49,7 +50,7 @@ const App = () => {
           </>
         ) : (
           <Text style={styles.heartRateTitleText}>
-            Please Connect to a Heart Rate Monitor
+            Please Connect to the Step Sensor
           </Text>
         )}
       </View>

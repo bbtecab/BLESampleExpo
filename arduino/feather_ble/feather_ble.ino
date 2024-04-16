@@ -1,4 +1,3 @@
-
 #include <Wire.h>
 #include <EEPROM.h>
 #include <BLEDevice.h>
@@ -55,7 +54,7 @@ void setup() {
   pAdvertising->addServiceUUID(SERVICE_UUID);
   pAdvertising->setScanResponse(true);
   pAdvertising->setMinPreferred(0x06);
-  pAdvertising->setMinPreferred(0x12);
+  pAdvertising->setMaxPreferred(0x100);
   BLEDevice::startAdvertising();
   Serial.println("BLE device is ready to be connected");
 

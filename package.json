@@ -19,7 +19,8 @@
     "react-native": "0.71.14",
     "react-native-base64": "^0.2.1",
     "react-native-ble-plx": "^3.1.2",
-    "react-native-web": "~0.18.9"
+    "react-native-web": "~0.18.9",
+    "expo-system-ui": "~2.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

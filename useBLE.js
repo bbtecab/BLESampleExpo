@@ -2,18 +2,18 @@
 import { useMemo, useState } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
 import {
-  BleError,
   BleManager,
-  Characteristic,
-  Device,
 } from "react-native-ble-plx";
 
 import * as ExpoDevice from "expo-device";
 
 import base64 from "react-native-base64";
 
+// todo update this to the correct UUID
 const HEART_RATE_UUID = "0000180d-0000-1000-8000-00805f9b34fb";
 const HEART_RATE_CHARACTERISTIC = "00002a37-0000-1000-8000-00805f9b34fb";
+const SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
+const STEP_DATA_CHAR_UUID = "beefcafe-36e1-4688-b7f5-00000000000b";
 
 
 function useBLE() {
@@ -97,12 +97,14 @@ function useBLE() {
     });
 
   const connectToDevice = async (device) => {
+    console.log("Connecting to Device", device.id);
     try {
       const deviceConnection = await bleManager.connectToDevice(device.id);
+      console.log("Connected to Device", deviceConnection);
       setConnectedDevice(deviceConnection);
       await deviceConnection.discoverAllServicesAndCharacteristics();
       bleManager.stopDeviceScan();
-      startStreamingData(deviceConnection);
+      //startStreamingData(deviceConnection);
     } catch (e) {
       console.log("FAILED TO CONNECT", e);
     }
@@ -147,8 +149,8 @@ function useBLE() {
   const startStreamingData = async (device) => {
     if (device) {
       device.monitorCharacteristicForService(
-        HEART_RATE_UUID,
-        HEART_RATE_CHARACTERISTIC,
+        SERVICE_UUID,
+        STEP_DATA_CHAR_UUID,
         onHeartRateUpdate
       );
     } else {
